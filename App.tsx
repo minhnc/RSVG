@@ -1,114 +1,90 @@
 /**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * Generated with the TypeScript template
- * https://github.com/react-native-community/react-native-template-typescript
+ * Sample SVG with React Native
+ * https://github.com/minhnc
  *
  * @format
  */
 
-import React from 'react';
-import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-} from 'react-native';
+import React, { Fragment, useState } from 'react';
+import { SafeAreaView, ScrollView, StyleSheet, View, Text } from 'react-native';
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+import Svg, { Circle, Text as SVGText, Line } from 'react-native-svg';
 
-const Section: React.FC<{
-  title: string;
-}> = ({children, title}) => {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
+type Task = {
+  name: string;
+  completed: boolean;
 };
 
 const App = () => {
-  const isDarkMode = useColorScheme() === 'dark';
+  const [tasks, setTasks] = useState(randomTasks(10));
 
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
+  const toggleTask = (index: number) => {
+    let clonedTasks = [...tasks];
+    clonedTasks[index].completed = !clonedTasks[index].completed;
+    setTasks(clonedTasks);
   };
 
+  const cR = 10;
+  const distanceInterC = 40;
+  const lineY1 = 20;
+  const distanceOuterC = 80; // distanceInterC + cR * 2
+
   return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
+    <SafeAreaView>
+      <ScrollView contentInsetAdjustmentBehavior="automatic">
+        <View style={styles.taskContainer}>
+          <Text>SVG TODO App</Text>
+          <Svg
+            viewBox={`0 0 10 ${tasks.length * distanceOuterC}`}
+            width="100%"
+            height={`${tasks.length * distanceOuterC}`}
+            stroke="black"
+            fill="white">
+            <Line
+              x1="10"
+              y1={lineY1}
+              x2="10"
+              y2={tasks.length * distanceInterC - lineY1}
+            />
+
+            {tasks.map((task, index) => (
+              <Fragment key={`fr-${index}`}>
+                <Circle
+                  key={`circle-${index}`}
+                  onPress={() => toggleTask(index)}
+                  cx="10"
+                  cy={index * distanceInterC + lineY1}
+                  r={cR}
+                  fill={task.completed ? 'black' : 'white'}
+                />
+
+                <SVGText
+                  key={`task-${index}`}
+                  fontSize="16"
+                  fill="black"
+                  x="30"
+                  y={index * distanceInterC + lineY1 + 5}>
+                  {task.name}
+                </SVGText>
+              </Fragment>
+            ))}
+          </Svg>
         </View>
       </ScrollView>
     </SafeAreaView>
   );
 };
 
+const randomTasks = (num: number): Task[] =>
+  [...Array(num)].map((_, index) => ({
+    name: `Task ${index}`,
+    completed: !!(index % 2),
+  }));
+
 const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
+  taskContainer: {
+    flex: 1,
+    margin: 24,
   },
 });
 
